@@ -8,7 +8,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// The person Type (more like an object)
+/*The person Type (more like an object)*/
 type Person struct {
 	ID        string   `json:"id,omitempty"`
 	Firstname string   `json:"firstname,omitempty"`
