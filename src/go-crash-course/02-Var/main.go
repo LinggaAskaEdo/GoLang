@@ -24,8 +24,8 @@ func main() {
 	// email := "a5k4_fansarsenal@yahoo.com"
 	size := 1.3
 
-	name, email := "Aska", "a5k4_fansarsenal@yahoo.com"
+	name, email, office := "Aska", "a5k4_fansarsenal@yahoo.com", "Plaza Oleos"
 
-	fmt.Println(name, age, isCool, email)
+	fmt.Println(name, "-", age, "-", isCool, "-", email, "-", office)
 	fmt.Printf("%T\n", size)
 }
