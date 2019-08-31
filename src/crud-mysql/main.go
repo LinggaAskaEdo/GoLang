@@ -5,6 +5,8 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 // Employee : class with id, name and city
@@ -16,8 +18,8 @@ type Employee struct {
 
 func dbConn() (db *sql.DB) {
 	dbDriver := "mysql"
-	dbUser := "dev"
-	dbPassword := "Password"
+	dbUser := "root"
+	dbPassword := "L1nggaa5k43d0"
 	dbName := "GO_TEST"
 	db, err := sql.Open(dbDriver, dbUser+":"+dbPassword+"@/"+dbName)
 
