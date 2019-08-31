@@ -3,15 +3,15 @@ package main
 import (
 	"database/sql"
 	"html/template"
-	"net/http"
 	"log"
-	_ "github.com/go-sql-driver/mysql"
+	"net/http"
 )
 
+// Employee : class with id, name and city
 type Employee struct {
-	Id 		int
-	Name 	string
-	City 	string
+	ID   int
+	Name string
+	City string
 }
 
 func dbConn() (db *sql.DB) {
@@ -19,7 +19,7 @@ func dbConn() (db *sql.DB) {
 	dbUser := "dev"
 	dbPassword := "Password"
 	dbName := "GO_TEST"
-	db, err := sql.Open(dbDriver, dbUser + ":" + dbPassword + "@/" + dbName)
+	db, err := sql.Open(dbDriver, dbUser+":"+dbPassword+"@/"+dbName)
 
 	if err != nil {
 		panic(err.Error())
@@ -28,8 +28,9 @@ func dbConn() (db *sql.DB) {
 	return db
 }
 
-var tmpl = template.Must(template.ParseGlob("D:/Documents/GoLang/src/crud-mysql/form/*"))
+var tmpl = template.Must(template.ParseGlob("form/*"))
 
+// Index : function to handle request and response
 func Index(w http.ResponseWriter, r *http.Request) {
 	db := dbConn()
 	selDB, err := db.Query("SELECT * FROM Employee ORDER BY id ASC")
@@ -50,7 +51,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 			panic(err.Error())
 		}
 
-		emp.Id = id
+		emp.ID = id
 		emp.Name = name
 		emp.City = city
 		res = append(res, emp)
@@ -60,10 +61,11 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 }
 
+// Show : function to handle request and response
 func Show(w http.ResponseWriter, r *http.Request) {
 	db := dbConn()
-	nId := r.URL.Query().Get("id")
-	selDB, err := db.Query("SELECT * FROM Employee WHERE id=?", nId)
+	nID := r.URL.Query().Get("id")
+	selDB, err := db.Query("SELECT * FROM Employee WHERE id=?", nID)
 
 	if err != nil {
 		panic(err.Error())
@@ -77,7 +79,7 @@ func Show(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			panic(err.Error())
 		}
-		emp.Id = id
+		emp.ID = id
 		emp.Name = name
 		emp.City = city
 	}
@@ -86,14 +88,16 @@ func Show(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 }
 
+// New : funtion to create new data
 func New(w http.ResponseWriter, r *http.Request) {
 	tmpl.ExecuteTemplate(w, "New", nil)
 }
 
+// Edit : funtion to edit data
 func Edit(w http.ResponseWriter, r *http.Request) {
 	db := dbConn()
-	nId := r.URL.Query().Get("id")
-	selDB, err := db.Query("SELECT * FROM Employee WHERE id=?", nId)
+	nID := r.URL.Query().Get("id")
+	selDB, err := db.Query("SELECT * FROM Employee WHERE id=?", nID)
 
 	if err != nil {
 		panic(err.Error())
@@ -110,7 +114,7 @@ func Edit(w http.ResponseWriter, r *http.Request) {
 			panic(err.Error())
 		}
 
-		emp.Id = id
+		emp.ID = id
 		emp.Name = name
 		emp.City = city
 	}
@@ -119,6 +123,7 @@ func Edit(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 }
 
+// Insert : function to add new data
 func Insert(w http.ResponseWriter, r *http.Request) {
 	db := dbConn()
 
@@ -138,6 +143,7 @@ func Insert(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", 301)
 }
 
+// Update : function to edit data
 func Update(w http.ResponseWriter, r *http.Request) {
 	db := dbConn()
 
@@ -159,6 +165,7 @@ func Update(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", 301)
 }
 
+// Delete : function to delete data
 func Delete(w http.ResponseWriter, r *http.Request) {
 	db := dbConn()
 	emp := r.URL.Query().Get("id")
