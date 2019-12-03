@@ -20,7 +20,7 @@ func main() {
 
 func returnAllUsers(w http.ResponseWriter, r *http.Request) {
 	var users Users
-	var arr_user []Users
+	var arrUser []Users
 	var response Response
 
 	db := connect()
@@ -36,13 +36,13 @@ func returnAllUsers(w http.ResponseWriter, r *http.Request) {
 		if err := rows.Scan(&users.Id, &users.FirstName, &users.LastName); err != nil {
 			log.Fatal(err.Error())
 		} else {
-			arr_user = append(arr_user, users)
+			arrUser = append(arrUser, users)
 		}
 	}
 
 	response.Status = 1
 	response.Message = "Success"
-	response.Data = arr_user
+	response.Data = arrUser
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
