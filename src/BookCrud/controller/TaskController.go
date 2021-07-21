@@ -89,7 +89,7 @@ func UpdateTask(c *gin.Context) {
 		return
 	}
 
-	// Validate input
+	// Validate input of Task
 	var input UpdateTaskInput
 
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -112,4 +112,21 @@ func UpdateTask(c *gin.Context) {
 	db.Model(&task).Updates(updatedInput)
 
 	c.JSON(http.StatusOK, gin.H{"data": task})
+}
+
+// DELETE /tasks/:id
+// Delete a task
+func DeleteTask(c *gin.Context) {
+	// Get model if exist
+	db := c.MustGet("db").(*gorm.DB)
+	var book model.Task
+
+	if err := db.Where("id = ?", c.Param("id")).First(&book).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Record not found!"})
+		return
+	}
+
+	db.Delete(&book)
+
+	c.JSON(http.StatusOK, gin.H{"data": true})
 }

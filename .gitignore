@@ -1,0 +1,9 @@
+src/github.com/*
+src/golang.org/*
+src/golang.org/x/tools
+src/go.mongodb.org/
+src/mongo-db/
+bin/*
+pkg/*
+build/
+.idea/
