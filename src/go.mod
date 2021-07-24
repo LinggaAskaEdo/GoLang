@@ -21,6 +21,7 @@ require (
 	github.com/jinzhu/gorm v1.9.16 // indirect
 	github.com/json-iterator/go v1.1.11 // indirect
 	github.com/keegancsmith/rpc v1.1.0
+	github.com/kisielk/errcheck v1.2.0 // indirect
 	github.com/kr/pretty v0.2.0
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/mattn/go-colorable v0.1.6
@@ -33,7 +34,7 @@ require (
 	github.com/nicksnyder/go-i18n v1.10.1 // indirect
 	github.com/onsi/ginkgo v1.12.0 // indirect
 	github.com/onsi/gomega v1.9.0 // indirect
-	github.com/pelletier/go-toml v1.6.0
+	github.com/pelletier/go-toml v1.7.0
 	github.com/pkg/errors v0.9.1
 	github.com/sqs/goreturns v0.0.0-20181028201513-538ac6014518
 	github.com/stamblerre/gocode v1.0.0
@@ -42,7 +43,7 @@ require (
 	github.com/ugorji/go v1.2.6 // indirect
 	github.com/xdg/scram v0.0.0-20180814205039-7eeb5667e42c
 	github.com/xdg/stringprep v1.0.0
-	go.mongodb.org/mongo-driver v1.3.1
+	go.mongodb.org/mongo-driver v1.5.1
 	golang.org/x/crypto v0.0.0-20210616213533-5ff15b29337e // indirect
 	golang.org/x/net v0.0.0-20210226172049-e18ecbb05110
 	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
