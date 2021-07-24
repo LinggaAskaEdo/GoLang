@@ -7,6 +7,7 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+// SetupRoutes function
 func SetupRoutes(db *gorm.DB) *gin.Engine {
 	r := gin.Default()
 

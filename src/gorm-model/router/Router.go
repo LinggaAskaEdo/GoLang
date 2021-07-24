@@ -17,7 +17,9 @@ func SetupRoutes(db *gorm.DB) *gin.Engine {
 
 	r.POST("/user", controller.CreateUser)
 	r.GET("/users", controller.GetUsers)
-	r.GET("/user/:id", controller.GetUser)
+	r.GET("/companies", controller.GetCompanies)
+	r.GET("/user-companies", controller.GetUserCompanies)
+	r.GET("/user-company/:id", controller.GetUserCompany)
 
 	return r
 }

@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"gorm-model/model"
+	"gorm-model/util"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -26,15 +27,63 @@ func CreateUser(c *gin.Context) {
 
 	db := c.MustGet("db").(*gorm.DB)
 	db.Create(&user)
+
 	c.JSON(http.StatusOK, gin.H{"data": user})
 }
 
 // GetUsers method:GET, endpoint:/users
 func GetUsers(c *gin.Context) {
+	var users []model.User
+
+	db := c.MustGet("db").(*gorm.DB)
+	db.Find(&users)
+
+	if users == nil {
+		c.JSON(http.StatusNoContent, nil)
+		return
+	}
+
+	responses := make([]model.Response, len(users))
+
+	for i, user := range users {
+		responses[i] = model.Response{CreatedAt: util.ReformatDate(user.CreatedAt), UpdatedAt: util.ReformatDate(user.UpdatedAt), UserID: user.ID, UserName: user.Name}
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"count": len(responses),
+		"users": responses,
+	})
+}
+
+// GetCompanies method:GET, endpoint:/companies
+func GetCompanies(c *gin.Context) {
+	var companies []model.Company
+
+	db := c.MustGet("db").(*gorm.DB)
+	db.Find(&companies)
+
+	if companies == nil {
+		c.JSON(http.StatusNoContent, nil)
+		return
+	}
+
+	responses := make([]model.Response, len(companies))
+
+	for i, company := range companies {
+		responses[i] = model.Response{CompanyID: company.ID, CompanyName: company.Name}
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"count":     len(responses),
+		"companies": responses,
+	})
+}
+
+// GetUserCompanies method:GET, endpoint:/user-companies
+func GetUserCompanies(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 	var users []model.User
 
-	// db.Find(&users)
 	db.Preload("Company").Find(&users)
 
 	c.JSON(http.StatusOK, gin.H{
@@ -43,8 +92,8 @@ func GetUsers(c *gin.Context) {
 	})
 }
 
-// GetUser method:GET, endpoint:/user/:id
-func GetUser(c *gin.Context) {
+// GetUserCompany method:GET, endpoint:/user-company/:id
+func GetUserCompany(c *gin.Context) {
 	var user model.User
 	db := c.MustGet("db").(*gorm.DB)
 

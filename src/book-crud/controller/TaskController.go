@@ -11,23 +11,25 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+// CreateTaskInput struct
 type CreateTaskInput struct {
 	AssignedTo  string `json:"assignedTo"`
 	Description string `json:"description"`
 	Deadline    string `json:"deadline"`
 }
 
+// UpdateTaskInput struct
 type UpdateTaskInput struct {
 	AssignedTo  string `json:"assignedTo"`
 	Description string `json:"description"`
 	Deadline    string `json:"deadline"`
 }
 
-// GET /tasks
-// Get all tasks
+// FindTasks method:GET endpoint:/tasks, desc:Get all tasks
 func FindTasks(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
 	var tasks []model.Task
+
+	db := c.MustGet("db").(*gorm.DB)
 	db.Find(&tasks)
 
 	c.JSON(http.StatusOK, gin.H{
@@ -36,8 +38,7 @@ func FindTasks(c *gin.Context) {
 	})
 }
 
-// POST /tasks
-// Create new task
+// CreateTask method:POST, endpoint:/tasks, desc:Create new task
 func CreateTask(c *gin.Context) {
 	//Validate input
 	var input CreateTaskInput
@@ -59,15 +60,16 @@ func CreateTask(c *gin.Context) {
 
 	db := c.MustGet("db").(*gorm.DB)
 	db.Create(&task)
+
 	c.JSON(http.StatusOK, gin.H{"data": task})
 }
 
-// GET /tasks/:id
-// Find a task
-func FindTask(c *gin.Context) { // Get model if exist
+// FindTask method:GET, endpoint:/tasks/:id, desc:Find a task
+func FindTask(c *gin.Context) {
 	var task model.Task
 	db := c.MustGet("db").(*gorm.DB)
 
+	// Get model if exist
 	if err := db.Where("id = ?", c.Param("id")).First(&task).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Record not found!"})
 		return
@@ -76,8 +78,7 @@ func FindTask(c *gin.Context) { // Get model if exist
 	c.JSON(http.StatusOK, gin.H{"data": task})
 }
 
-// PATCH /tasks/:id
-// Update a task
+// UpdateTask method:PATCH endpoint:/tasks/:id, desc:Update a task
 func UpdateTask(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 
@@ -114,8 +115,7 @@ func UpdateTask(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": task})
 }
 
-// DELETE /tasks/:id
-// Delete a task
+// DeleteTask method:DELETE,  endpoint:/tasks/:id, desc:Delete a task
 func DeleteTask(c *gin.Context) {
 	// Get model if exist
 	db := c.MustGet("db").(*gorm.DB)
