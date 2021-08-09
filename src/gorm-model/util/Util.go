@@ -10,7 +10,7 @@ import (
 
 	"github.com/go-redis/redis/v7"
 
-	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt"
 	"github.com/twinj/uuid"
 )
 

@@ -10,6 +10,7 @@ require (
 	github.com/go-redis/redis v6.15.9+incompatible // indirect
 	github.com/go-redis/redis/v7 v7.4.1 // indirect
 	github.com/go-sql-driver/mysql v1.5.0
+	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/henrylee2cn/goutil v0.0.0-20210421033923-b50c8d7a9d5d // indirect
 	github.com/jinzhu/gorm v1.9.16
 	github.com/nyaruka/phonenumbers v1.0.70 // indirect
