@@ -2,14 +2,21 @@ package main
 
 import (
 	"gorm-model/config"
-	"gorm-model/model"
-	"gorm-model/router"
+	entity "gorm-model/model/entity"
 )
 
 func main() {
+	// Initializing database
 	db := config.SetupDB()
-	db.AutoMigrate(&model.User{}, &model.Company{})
+	db.AutoMigrate(&entity.User{}, &entity.Company{}, &entity.Credential{})
 
-	r := router.SetupRoutes(db)
-	r.Run()
+	// Initializing redis
+	redisClient := config.SetupRedis()
+
+	router := config.SetupRoutes(db, redisClient)
+	err := router.Run()
+
+	if err != nil {
+		return
+	}
 }

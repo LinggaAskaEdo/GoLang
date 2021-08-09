@@ -3,105 +3,73 @@ package controller
 import (
 	"net/http"
 
-	"gorm-model/model"
-	"gorm-model/util"
+	dto "gorm-model/model/dto"
+	"gorm-model/service"
 
+	"github.com/bytedance/go-tagexpr/validator"
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 )
 
-// CreateUser method:POST, endpoint:/user
-func CreateUser(c *gin.Context) {
-	// Validate input
-	var input model.Request
+// Login method:POST, endpoint:/login
+func Login(context *gin.Context) {
+	var auth dto.Auth
 
-	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := context.ShouldBindJSON(&auth); err != nil {
+		context.JSON(http.StatusUnprocessableEntity, gin.H{
+			"status":  http.StatusUnprocessableEntity,
+			"message": "Invalid json provided"})
 		return
 	}
 
-	// Create User
-	user := model.User{
-		Name:    input.UserName,
-		Company: model.Company{Name: input.CompanyName}}
+	service.Login(context, auth)
+}
 
-	db := c.MustGet("db").(*gorm.DB)
-	db.Create(&user)
+// CreateUser method:POST, endpoint:/user
+func CreateUser(context *gin.Context) {
+	// Validate input
+	var input dto.Request
+	var vd = validator.New("vd")
 
-	c.JSON(http.StatusOK, gin.H{"data": user})
+	if err := context.ShouldBindJSON(&input); err != nil {
+		context.JSON(http.StatusUnprocessableEntity, gin.H{
+			"status":  http.StatusUnprocessableEntity,
+			"message": "Invalid json provided"})
+		return
+	}
+
+	type RequesrValidation struct {
+		UserName    string `vd:"len($)>3"`
+		CompanyName string `vd:"len($)>3"`
+	}
+
+	requesrValidation := &RequesrValidation{UserName: input.UserName, CompanyName: input.CompanyName}
+
+	if err := vd.Validate(requesrValidation); err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{
+			"status": http.StatusBadRequest,
+			"error":  err.Error()})
+		return
+	}
+
+	service.CreateUserService(context, input)
 }
 
 // GetUsers method:GET, endpoint:/users
-func GetUsers(c *gin.Context) {
-	var users []model.User
-
-	db := c.MustGet("db").(*gorm.DB)
-	db.Find(&users)
-
-	if users == nil {
-		c.JSON(http.StatusNoContent, nil)
-		return
-	}
-
-	responses := make([]model.Response, len(users))
-
-	for i, user := range users {
-		responses[i] = model.Response{CreatedAt: util.ReformatDate(user.CreatedAt), UpdatedAt: util.ReformatDate(user.UpdatedAt), UserID: user.ID, UserName: user.Name}
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"count": len(responses),
-		"users": responses,
-	})
+func GetUsers(context *gin.Context) {
+	service.GetUsersService(context)
 }
 
 // GetCompanies method:GET, endpoint:/companies
-func GetCompanies(c *gin.Context) {
-	var companies []model.Company
-
-	db := c.MustGet("db").(*gorm.DB)
-	db.Find(&companies)
-
-	if companies == nil {
-		c.JSON(http.StatusNoContent, nil)
-		return
-	}
-
-	responses := make([]model.Response, len(companies))
-
-	for i, company := range companies {
-		responses[i] = model.Response{CompanyID: company.ID, CompanyName: company.Name}
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"count":     len(responses),
-		"companies": responses,
-	})
+func GetCompanies(context *gin.Context) {
+	service.GetCompaniesService(context)
 }
 
 // GetUserCompanies method:GET, endpoint:/user-companies
-func GetUserCompanies(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
-	var users []model.User
-
-	db.Preload("Company").Find(&users)
-
-	c.JSON(http.StatusOK, gin.H{
-		"count": len(users),
-		"data":  users,
-	})
+func GetUserCompanies(context *gin.Context) {
+	service.GetUserCompaniesService(context)
 }
 
 // GetUserCompany method:GET, endpoint:/user-company/:id
-func GetUserCompany(c *gin.Context) {
-	var user model.User
-	db := c.MustGet("db").(*gorm.DB)
-
-	if err := db.Preload("Company").First(&user, c.Param("id")).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Record not found!"})
-
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"data": user})
+func GetUserCompany(context *gin.Context) {
+	service.GetUserCompanyService(context)
 }
