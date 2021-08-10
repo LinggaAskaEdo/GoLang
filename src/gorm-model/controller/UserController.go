@@ -5,50 +5,10 @@ import (
 
 	dto "gorm-model/model/dto"
 	"gorm-model/service"
-	"gorm-model/util"
 
 	"github.com/bytedance/go-tagexpr/validator"
 	"github.com/gin-gonic/gin"
 )
-
-// Login method:POST, endpoint:/login
-func Login(context *gin.Context) {
-	var auth dto.Auth
-
-	if err := context.ShouldBindJSON(&auth); err != nil {
-		context.JSON(http.StatusUnprocessableEntity, gin.H{
-			"status":  http.StatusUnprocessableEntity,
-			"message": "Invalid json provided"})
-		return
-	}
-
-	service.Login(context, auth)
-}
-
-// Logout method:POST, endpoint:/logout
-func Logout(context *gin.Context) {
-	au, err := util.ExtractTokenMetadata(context.Request)
-
-	if err != nil {
-		context.JSON(http.StatusUnauthorized, gin.H{
-			"status": http.StatusUnauthorized,
-			"error":  err.Error()})
-		return
-	}
-
-	deleted, delErr := util.DeleteAuth(context, au.AccessUUID)
-
-	if delErr != nil || deleted == 0 { //if any goes wrong
-		context.JSON(http.StatusUnauthorized, gin.H{
-			"status": http.StatusUnauthorized,
-			"error":  err.Error()})
-		return
-	}
-
-	context.JSON(http.StatusOK, gin.H{
-		"status":  http.StatusOK,
-		"message": "Successfully logged out"})
-}
 
 // CreateUser method:POST, endpoint:/user
 func CreateUser(context *gin.Context) {
@@ -60,24 +20,6 @@ func CreateUser(context *gin.Context) {
 		context.JSON(http.StatusUnprocessableEntity, gin.H{
 			"status":  http.StatusUnprocessableEntity,
 			"message": "Invalid json provided"})
-		return
-	}
-
-	tokenAuth, err := util.ExtractTokenMetadata(context.Request)
-
-	if err != nil {
-		context.JSON(http.StatusUnauthorized, gin.H{
-			"status": http.StatusUnauthorized,
-			"error":  err.Error()})
-		return
-	}
-
-	_, err = util.FetchAuth(context, tokenAuth)
-
-	if err != nil {
-		context.JSON(http.StatusUnauthorized, gin.H{
-			"status": http.StatusUnauthorized,
-			"error":  err.Error()})
 		return
 	}
 

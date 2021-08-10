@@ -27,8 +27,8 @@ func ReformatDate(date time.Time) string {
 func CreateToken(email string) (*dto.TokenDetails, error) {
 	tokenDetails := &dto.TokenDetails{}
 	tokenDetails.AtExpires = time.Now().Add(time.Minute * 15).Unix()
-	tokenDetails.AccessUUID = uuid.NewV4().String()
 	tokenDetails.RtExpires = time.Now().Add(time.Hour * 24 * 7).Unix()
+	tokenDetails.AccessUUID = uuid.NewV4().String()
 	tokenDetails.RefreshUUID = uuid.NewV4().String()
 
 	var err error
@@ -84,24 +84,9 @@ func CreateAuth(context *gin.Context, userid uint64, td *dto.TokenDetails) error
 	return nil
 }
 
-// TokenAuthMiddleware function
-func TokenAuthMiddleware() gin.HandlerFunc {
-	return func(context *gin.Context) {
-		err := TokenValid(context.Request)
-
-		if err != nil {
-			context.JSON(http.StatusUnauthorized, err.Error())
-			context.Abort()
-			return
-		}
-
-		context.Next()
-	}
-}
-
 // ExtractToken function
-func ExtractToken(r *http.Request) string {
-	bearToken := r.Header.Get("Authorization")
+func ExtractToken(request *http.Request) string {
+	bearToken := request.Header.Get("Authorization")
 	//normally Authorization the_token_xxx
 	strArr := strings.Split(bearToken, " ")
 
@@ -113,8 +98,8 @@ func ExtractToken(r *http.Request) string {
 }
 
 // VerifyToken function
-func VerifyToken(r *http.Request) (*jwt.Token, error) {
-	tokenString := ExtractToken(r)
+func VerifyToken(request *http.Request) (*jwt.Token, error) {
+	tokenString := ExtractToken(request)
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		//Make sure that the token method conform to "SigningMethodHMAC"
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -130,24 +115,56 @@ func VerifyToken(r *http.Request) (*jwt.Token, error) {
 	return token, nil
 }
 
-// TokenValid function
-func TokenValid(r *http.Request) error {
-	token, err := VerifyToken(r)
+// TokenAuthMiddleware function
+func TokenAuthMiddleware() gin.HandlerFunc {
+	return func(context *gin.Context) {
+		token, err := VerifyToken(context.Request)
 
-	if err != nil {
-		return err
+		if err != nil {
+			context.JSON(http.StatusUnauthorized, gin.H{
+				"status": http.StatusUnauthorized,
+				"error":  err.Error()})
+			context.Abort()
+			return
+		}
+
+		claims, ok := token.Claims.(jwt.MapClaims)
+
+		if ok && token.Valid {
+			accessUUID, ok := claims["access_uuid"].(string)
+
+			if !ok {
+				context.JSON(http.StatusUnauthorized, gin.H{
+					"status": http.StatusUnauthorized,
+					"error":  err.Error()})
+				context.Abort()
+				return
+			}
+
+			fetchData, getErr := FetchAuth(context, accessUUID)
+
+			if getErr != nil || fetchData == 0 { //if any goes wrong
+				context.JSON(http.StatusUnauthorized, gin.H{
+					"status": http.StatusUnauthorized,
+					"error":  "Unauthorized"})
+				context.Abort()
+				return
+			}
+		} else {
+			context.JSON(http.StatusUnauthorized, gin.H{
+				"status": http.StatusUnauthorized,
+				"error":  err.Error()})
+			context.Abort()
+			return
+		}
+
+		context.Next()
 	}
-
-	if _, ok := token.Claims.(jwt.Claims); !ok && !token.Valid {
-		return err
-	}
-
-	return nil
 }
 
 // ExtractTokenMetadata function
-func ExtractTokenMetadata(r *http.Request) (*dto.AccessDetails, error) {
-	token, err := VerifyToken(r)
+func ExtractTokenMetadata(request *http.Request) (*dto.AccessDetails, error) {
+	token, err := VerifyToken(request)
 
 	if err != nil {
 		return nil, err
@@ -178,16 +195,16 @@ func ExtractTokenMetadata(r *http.Request) (*dto.AccessDetails, error) {
 }
 
 // FetchAuth function
-func FetchAuth(context *gin.Context, authD *dto.AccessDetails) (uint64, error) {
+func FetchAuth(context *gin.Context, givenUUID string) (uint64, error) {
 	redisClient := context.MustGet("redis").(*redis.Client)
-	userid, err := redisClient.Get(authD.AccessUUID).Result()
+	fetched, err := redisClient.Get(givenUUID).Result()
 
 	if err != nil {
 		return 0, err
 	}
 
-	userID, _ := strconv.ParseUint(userid, 10, 64)
-	return userID, nil
+	fetchData, _ := strconv.ParseUint(fetched, 10, 64)
+	return fetchData, nil
 }
 
 // DeleteAuth function

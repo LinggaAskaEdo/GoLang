@@ -5,6 +5,8 @@ import (
 
 	"github.com/go-redis/redis/v7"
 
+	"gorm-model/util"
+
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 )
@@ -20,13 +22,14 @@ func SetupRoutes(db *gorm.DB, redis *redis.Client) *gin.Engine {
 
 	router.POST("/login", controller.Login)
 	router.POST("/logout", controller.Logout)
+	router.POST("/refresh", controller.Refresh)
 
 	// ONE to ONE relationship
-	router.POST("/user", controller.CreateUser)
-	router.GET("/users", controller.GetUsers)
-	router.GET("/companies", controller.GetCompanies)
-	router.GET("/user-companies", controller.GetUserCompanies)
-	router.GET("/user-company/:id", controller.GetUserCompany)
+	router.POST("/user", util.TokenAuthMiddleware(), controller.CreateUser)
+	router.GET("/users", util.TokenAuthMiddleware(), controller.GetUsers)
+	router.GET("/companies", util.TokenAuthMiddleware(), controller.GetCompanies)
+	router.GET("/user-companies", util.TokenAuthMiddleware(), controller.GetUserCompanies)
+	router.GET("/user-company/:id", util.TokenAuthMiddleware(), controller.GetUserCompany)
 
 	return router
 }

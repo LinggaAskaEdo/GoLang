@@ -11,43 +11,6 @@ import (
 	"gorm-model/util"
 )
 
-// Login function
-func Login(context *gin.Context, input dto.Auth) {
-	var cred entity.Credential
-
-	db := context.MustGet("db").(*gorm.DB)
-	db.Limit(1).Find(&cred)
-
-	if &cred == nil {
-		context.JSON(http.StatusNoContent, nil)
-		return
-	}
-
-	if input.Email != cred.Email || input.Password != cred.Password {
-		context.JSON(http.StatusUnauthorized, gin.H{
-			"status":  http.StatusUnauthorized,
-			"message": "Please provide valid login details"})
-		return
-	}
-
-	token, err := util.CreateToken(cred.Email)
-
-	if err != nil {
-		context.JSON(http.StatusUnprocessableEntity, err.Error())
-		return
-	}
-
-	saveToken := util.CreateAuth(context, cred.ID, token)
-
-	if saveToken != nil {
-		context.JSON(http.StatusUnprocessableEntity, saveToken.Error())
-	}
-
-	context.JSON(http.StatusOK, gin.H{
-		"access_token":  token.AccessToken,
-		"refresh_token": token.RefreshToken})
-}
-
 // CreateUserService function
 func CreateUserService(context *gin.Context, input dto.Request) {
 	user := entity.User{
