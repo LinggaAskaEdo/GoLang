@@ -5,6 +5,7 @@ import (
 
 	dto "gorm-model/model/dto"
 	"gorm-model/service"
+	"gorm-model/util"
 
 	"github.com/bytedance/go-tagexpr/validator"
 	"github.com/gin-gonic/gin"
@@ -24,6 +25,31 @@ func Login(context *gin.Context) {
 	service.Login(context, auth)
 }
 
+// Logout method:POST, endpoint:/logout
+func Logout(context *gin.Context) {
+	au, err := util.ExtractTokenMetadata(context.Request)
+
+	if err != nil {
+		context.JSON(http.StatusUnauthorized, gin.H{
+			"status": http.StatusUnauthorized,
+			"error":  err.Error()})
+		return
+	}
+
+	deleted, delErr := util.DeleteAuth(context, au.AccessUUID)
+
+	if delErr != nil || deleted == 0 { //if any goes wrong
+		context.JSON(http.StatusUnauthorized, gin.H{
+			"status": http.StatusUnauthorized,
+			"error":  err.Error()})
+		return
+	}
+
+	context.JSON(http.StatusOK, gin.H{
+		"status":  http.StatusOK,
+		"message": "Successfully logged out"})
+}
+
 // CreateUser method:POST, endpoint:/user
 func CreateUser(context *gin.Context) {
 	// Validate input
@@ -37,14 +63,32 @@ func CreateUser(context *gin.Context) {
 		return
 	}
 
-	type RequesrValidation struct {
+	tokenAuth, err := util.ExtractTokenMetadata(context.Request)
+
+	if err != nil {
+		context.JSON(http.StatusUnauthorized, gin.H{
+			"status": http.StatusUnauthorized,
+			"error":  err.Error()})
+		return
+	}
+
+	_, err = util.FetchAuth(context, tokenAuth)
+
+	if err != nil {
+		context.JSON(http.StatusUnauthorized, gin.H{
+			"status": http.StatusUnauthorized,
+			"error":  err.Error()})
+		return
+	}
+
+	type RequestValidation struct {
 		UserName    string `vd:"len($)>3"`
 		CompanyName string `vd:"len($)>3"`
 	}
 
-	requesrValidation := &RequesrValidation{UserName: input.UserName, CompanyName: input.CompanyName}
+	requestValidation := &RequestValidation{UserName: input.UserName, CompanyName: input.CompanyName}
 
-	if err := vd.Validate(requesrValidation); err != nil {
+	if err := vd.Validate(requestValidation); err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{
 			"status": http.StatusBadRequest,
 			"error":  err.Error()})

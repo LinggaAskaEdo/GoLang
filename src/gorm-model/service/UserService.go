@@ -37,13 +37,15 @@ func Login(context *gin.Context, input dto.Auth) {
 		return
 	}
 
-	saveToken := util.StoreToken(context, cred.ID, token)
+	saveToken := util.CreateAuth(context, cred.ID, token)
 
 	if saveToken != nil {
 		context.JSON(http.StatusUnprocessableEntity, saveToken.Error())
 	}
 
-	context.JSON(http.StatusOK, gin.H{"access_token": token.AccessToken, "refresh_token": token.RefreshToken})
+	context.JSON(http.StatusOK, gin.H{
+		"access_token":  token.AccessToken,
+		"refresh_token": token.RefreshToken})
 }
 
 // CreateUserService function

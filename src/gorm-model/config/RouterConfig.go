@@ -19,6 +19,7 @@ func SetupRoutes(db *gorm.DB, redis *redis.Client) *gin.Engine {
 	})
 
 	router.POST("/login", controller.Login)
+	router.POST("/logout", controller.Logout)
 
 	// ONE to ONE relationship
 	router.POST("/user", controller.CreateUser)
