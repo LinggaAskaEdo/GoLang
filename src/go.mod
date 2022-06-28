@@ -1,8 +1,9 @@
 module chapter-A.60-go-modules
 
-go 1.14
+go 1.17
 
 require (
+	bitbucket.org/shipperid/go-svc-code v0.18.31 // indirect
 	github.com/BurntSushi/toml v0.3.1
 	github.com/alecthomas/units v0.0.0-20190924025748-f65c72e2690d // indirect
 	github.com/fatih/structs v1.1.0
@@ -23,9 +24,11 @@ require (
 	github.com/keegancsmith/rpc v1.1.0
 	github.com/kisielk/errcheck v1.2.0 // indirect
 	github.com/kr/pretty v0.2.0
+	github.com/labstack/echo v3.3.10+incompatible // indirect
+	github.com/labstack/gommon v0.3.1 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
-	github.com/mattn/go-colorable v0.1.6
-	github.com/mattn/go-isatty v0.0.13
+	github.com/mattn/go-colorable v0.1.11
+	github.com/mattn/go-isatty v0.0.14
 	github.com/mdempsky/gocode v0.0.0-20191202075140-939b4a677f2f
 	github.com/mgechev/dots v0.0.0-20190921121421-c36f7dcfbb81
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
@@ -38,7 +41,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/sqs/goreturns v0.0.0-20181028201513-538ac6014518
 	github.com/stamblerre/gocode v1.0.0
-	github.com/stretchr/testify v1.6.1
+	github.com/stretchr/testify v1.7.0
 	github.com/tidwall/pretty v1.0.1
 	github.com/ugorji/go v1.2.6 // indirect
 	github.com/xdg/scram v0.0.0-20180814205039-7eeb5667e42c
@@ -47,7 +50,6 @@ require (
 	golang.org/x/crypto v0.0.0-20210616213533-5ff15b29337e // indirect
 	golang.org/x/net v0.0.0-20210226172049-e18ecbb05110
 	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
-	golang.org/x/sys v0.0.0-20210630005230-0f9fa26af87c // indirect
 	golang.org/x/text v0.3.6 // indirect
 	golang.org/x/tools v0.0.0-20200305140159-d7d444866696
 	google.golang.org/appengine v1.6.5
