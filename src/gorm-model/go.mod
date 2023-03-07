@@ -4,7 +4,7 @@ go 1.16
 
 require (
 	github.com/bytedance/go-tagexpr v2.7.4+incompatible
-	github.com/gin-gonic/gin v1.7.2
+	github.com/gin-gonic/gin v1.7.7
 	github.com/go-redis/redis/v7 v7.4.1
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
