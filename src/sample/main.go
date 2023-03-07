@@ -2,14 +2,11 @@ package main
 
 import (
 	"fmt"
-
-	"bitbucket.org/shipperid/go-svc-code/constanta/sqlx"
 )
 
 type Data struct {
-	Name      string
-	Grade     int
-	Breakfast sqlx.NullString
+	Name  string
+	Grade int
 }
 
 func main() {
@@ -36,7 +33,7 @@ func main() {
 
 	vName, foundName := data["name"]
 	vGrade, foundGrade := data["grade"]
-	vBreakfast, foundBreakfast := data["breakfast"]
+	_, foundBreakfast := data["breakfast"]
 	if foundName && foundGrade && foundBreakfast {
 		// breakfast = fmt.Sprintf("%v", vBreakfast)
 		// fmt.Println(breakfast)
@@ -55,12 +52,6 @@ func main() {
 
 		if vGrade != nil {
 			dataObj.Grade = vGrade.(int)
-		}
-
-		if vBreakfast != nil {
-			dataObj.Breakfast = sqlx.NullString{String: vBreakfast.String, Valid: false}
-		} else {
-			dataObj.Breakfast = sqlx.NullString{String: fmt.Sprintf("%v", vBreakfast), Valid: true}
 		}
 	}
 
@@ -86,19 +77,4 @@ func main() {
 	// 		proc2(fruit)
 	// 	}
 	// }
-}
-
-func proc1(fruit string) {
-	if fruit == "apple" {
-		return
-	}
-
-	fmt.Println("proc1: ", fruit)
-
-	return
-}
-
-func proc2(fruit string) {
-	fmt.Println("proc2: ", fruit)
-	return
 }
